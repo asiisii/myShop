@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const userSchema = mongoose.Schema(
   {
@@ -25,6 +26,22 @@ const userSchema = mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Match user entered password to hashed password in database
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Encrypt password using bcrypt
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    // Do nothing if password hasn't been modified
+    next();
+  }
+
+  const salt = await bcrypt.genSalt(10); // Generate salt if it is modified
+  this.password = await bcrypt.hash(this.password, salt); //takes in the salt and the password to create a hashed password
+});
 
 const User = mongoose.model('User', userSchema);
 
