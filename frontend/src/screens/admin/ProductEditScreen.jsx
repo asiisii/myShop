@@ -128,6 +128,7 @@ const ProductEditScreen = () => {
                 onChange={uploadImgHandler}
               ></Form.Control>
             </Form.Group>
+            {loadingUpload && <Loader />}
 
             <Form.Group controlId='brand'>
               <Form.Label>Brand</Form.Label>
