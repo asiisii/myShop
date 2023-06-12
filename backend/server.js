@@ -24,8 +24,6 @@ app.use(express.urlencoded({ extended: true })); //for url encoded data
 // cookie parser middleware - allows us to access request.cookie
 app.use(cookieParser());
 
-app.get('/', (req, res) => res.send('API is up and running!'));
-
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
@@ -37,6 +35,16 @@ app.get('/api/config/paypal', (req, res) =>
 
 const __dirname = path.resolve(); //get current directory
 app.use('/uploads', express.static(path.join(__dirname, '/uploads'))); // set static folder
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '/frontend/build')));
+  // any route that doesn't match the above, send the index.html file
+  app.get('*', (req, res) =>
+    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'))
+  );
+} else {
+  app.get('/', (req, res) => res.send('API is up and running!'));
+}
 
 app.use(notFound);
 app.use(errorHandler);
