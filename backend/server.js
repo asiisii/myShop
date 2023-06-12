@@ -33,16 +33,18 @@ app.get('/api/config/paypal', (req, res) =>
   res.send({ clientId: process.env.PAYPAL_CLIENT_ID })
 );
 
-const __dirname = path.resolve(); //get current directory
-app.use('/uploads', express.static(path.join(__dirname, '/uploads'))); // set static folder
-
 if (process.env.NODE_ENV === 'production') {
+  const __dirname = path.resolve(); //get current directory
+  app.use('/uploads', express.static('/var/data/uploads')); // set static folder
   app.use(express.static(path.join(__dirname, '/frontend/build')));
+
   // any route that doesn't match the above, send the index.html file
   app.get('*', (req, res) =>
     res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'))
   );
 } else {
+  const __dirname = path.resolve();
+  app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
   app.get('/', (req, res) => res.send('API is up and running!'));
 }
 
